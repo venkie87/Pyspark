@@ -1,0 +1,51 @@
+Right approach
+
+no of node :6 node
+no of core :16 core
+size of mem:64 GB
+
+1 core and 1 GB for OS and haoop daemons for each node.
+
+Hence remain
+no of node :6 node
+no of core :16-1 , 15 core
+size of mem:64-1 , 63 GB
+
+now total:
+15 * 6 = 90 cores
+63 * 6 = 378 GB
+
+as HDFS I/O throughput is not good beyond 5 parallel process , we can restrict to 5 core.
+
+5 core - per executor, i have 15 core (15core/5), so i can scale upto 3 executor on each node. 
+(which is 3 executor * 6 node = 18 executor)
+
+now,on each node has
+5 core -> 
+63/3 = 21 gb 
+
+But, again we need to 1 executor for application manager and .07 percentage memory for memory overhead like yarn.driver.memoryoverhead 
+and yarn.executor.memoryoverhead , etc..
+
+Hence the following would be final calcuation
+21 * 0.07 = 1.47
+21 - 1.47 = 19.53 round of to ~ 19 GB per executor
+
+18 - 1 (for AM) = 17 executor total , would be like 3,3,3,3,3,2
+
+5 core for each executor
+
+-->result
+--num-executors 17 --executor-cores 5 --executor-memory 19G.
+
+https://blog.cloudera.com/how-to-tune-your-apache-spark-jobs-part-2/
+https://clouderatemp.wpengine.com/blog/2014/05/apache-spark-resource-management-and-yarn-app-models/
+https://stackoverflow.com/questions/24622108/apache-spark-the-number-of-cores-vs-the-number-of-executors
+https://www.youtube.com/watch?v=SmLx4VXbHho
+https://www.youtube.com/watch?v=unAFQ9XYlPU
+https://spark.apache.org/docs/latest/running-on-yarn.html
+https://github.com/sul-dlss-labs/ld4p-data-pipeline/wiki/Spark-Cluster-Capacity-Planning
+https://dzone.com/articles/apache-spark-on-yarn-resource-planning
+
+
+
